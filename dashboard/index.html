@@ -3,12 +3,108 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Token Radar: pre-token protocols ranked by implied value</title>
+<title>Token Radar — pre-token DeFi, ranked by implied launch value</title>
 <link rel="stylesheet" href="app.css">
 </head>
 <body>
-<a class="skip" href="#board">Skip to the board</a>
-<main id="board" tabindex="-1" aria-busy="true"></main>
+<header class="hero">
+  <div class="wrap">
+    <h1>Token Radar</h1>
+    <p class="tagline">Pre-token DeFi protocols, ranked by what their token would be worth if it launched at the multiple its own category already trades at.</p>
+    <p class="meta" id="meta"></p>
+    <nav class="tabs" id="tabs">
+      <button data-tab="board" class="active">Board</button>
+      <button data-tab="live">Live tokens</button>
+      <button data-tab="model">The model</button>
+    </nav>
+  </div>
+</header>
+<main class="wrap">
+  <section id="tab-board" class="tabpage">
+    <div class="top5" id="top5"></div>
+    <form class="filters" id="filters">
+      <label>Category
+        <select id="f-category"></select>
+      </label>
+      <label>Chain
+        <select id="f-chain"></select>
+      </label>
+      <label>TVL
+        <select id="f-tvl">
+          <option value="">Any TVL</option>
+          <option value="0-10000000">Under $10M</option>
+          <option value="10000000-50000000">$10M – $50M</option>
+          <option value="50000000-100000000">$50M – $100M</option>
+          <option value="100000000-1000000000">$100M – $1B</option>
+          <option value="1000000000-">Over $1B</option>
+        </select>
+      </label>
+      <label>Implied value
+        <select id="f-implied">
+          <option value="">Any implied value</option>
+          <option value="0-10000000">Under $10M</option>
+          <option value="10000000-50000000">$10M – $50M</option>
+          <option value="50000000-100000000">$50M – $100M</option>
+          <option value="100000000-1000000000">$100M – $1B</option>
+          <option value="1000000000-">Over $1B</option>
+        </select>
+      </label>
+      <label class="search">Search
+        <input id="f-q" type="search" placeholder="Name or slug…" autocomplete="off">
+      </label>
+      <button type="button" id="f-clear">Clear</button>
+    </form>
+    <p class="count" id="count"></p>
+    <div class="tablewrap">
+      <table id="board">
+        <thead>
+          <tr>
+            <th>#</th><th>Protocol</th><th>Category</th><th>Chains</th>
+            <th class="num">TVL</th><th class="num">7d</th><th class="num">Implied value</th>
+          </tr>
+        </thead>
+        <tbody id="board-body"></tbody>
+      </table>
+    </div>
+    <section id="detail" class="detail" hidden></section>
+  </section>
+  <section id="tab-live" class="tabpage" hidden>
+    <h2>Live tokens: the comparables</h2>
+    <p>Every protocol below already has a token. Its market cap divided by its TVL is the multiple the board's categories are measured against — this is the evidence the ranking stands on, not a claim.</p>
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr><th>Protocol</th><th>Category</th><th class="num">TVL</th><th class="num">Market cap</th><th class="num">Multiple</th></tr>
+        </thead>
+        <tbody id="live-body"></tbody>
+      </table>
+    </div>
+  </section>
+  <section id="tab-model" class="tabpage" hidden>
+    <h2>The model</h2>
+    <p class="formula">implied = round(TVL × category multiple × growth × maturity × chains)</p>
+    <ul class="modelnotes">
+      <li><strong>Category multiple.</strong> For each category, the median mcap/TVL of its protocols whose token already trades, shrunk toward the global median (0.25× across live tokens) with a prior weight of 5, and clamped to [0.02, 1.0]. A category with no live tokens takes the global median.</li>
+      <li><strong>CEX excluded.</strong> Exchange tokens trade against user balances, not protocol TVL, so they carry no multiple for a protocol launch.</li>
+      <li><strong>Growth.</strong> The protocol's 7-day TVL change, clamped to [−60, 120] and counted at half weight: a hot week is a hint, not a value.</li>
+      <li><strong>Maturity.</strong> 0.6 for a protocol listed yesterday, rising to 1.0 at three years old; an unknown listing date counts as one year.</li>
+      <li><strong>Chains.</strong> Each chain past the first adds 2%, up to five extra.</li>
+      <li><strong>No name is special-cased.</strong> The same formula scores all 758 protocols in the snapshot.</li>
+    </ul>
+    <h3>Category comps</h3>
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr><th>Category</th><th class="num">Live comps (n)</th><th class="num">Median multiple</th><th class="num">Applied multiple</th></tr>
+        </thead>
+        <tbody id="comp-body"></tbody>
+      </table>
+    </div>
+  </section>
+  <footer>
+    <p>Data: DefiLlama protocol snapshot, sealed 2026-11-14. The board is a ranking of implied values, not investment advice — no token is announced, and every farm plan is speculative.</p>
+  </footer>
+</main>
 <script src="../data.js"></script>
 <script src="app.js"></script>
 </body>
